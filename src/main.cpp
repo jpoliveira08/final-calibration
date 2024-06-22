@@ -3,7 +3,7 @@
 #define CLOCKRATE 80000000 /* Hz */
 #define TIMERDIVIDER 4
 
-#define NSAMPLES_SHIFT (1)
+#define NSAMPLES_SHIFT (0)
 #define OVER_SAMPLE_RATIO (16)
 #define CYCLES (20)
 #define NSAMPLES (OVER_SAMPLE_RATIO * CYCLES) + NSAMPLES_SHIFT // 321
@@ -55,7 +55,7 @@ void loop() {
   if (countRmsMeasurements <= 180) {
     sumVoltageToSend += measurements.vrms;
     sumCurrentToSend += measurements.irms;
-    sumRealPowerToSend += measurements.apparentPower;
+    sumRealPowerToSend += measurements.realPower;
 
     countRmsMeasurements++;
     
@@ -170,27 +170,27 @@ void readAnalogSamples() {
 }
 
 struct ElectricalMeasurements measureRms(int* voltageSamples, int* currentSamples, int nsamples) {
-  int voltageSamplesFiltered[NSAMPLES - NSAMPLES_SHIFT];
-  int currentSamplesFiltered[NSAMPLES - NSAMPLES_SHIFT];
+  // int voltageSamplesFiltered[NSAMPLES - NSAMPLES_SHIFT];
+  // int currentSamplesFiltered[NSAMPLES - NSAMPLES_SHIFT];
 
-  for (int i = 0; i < NSAMPLES; i++) { // posição 0 até 320 
-    if (i == 0) {
-      voltageSamplesFiltered[i] = voltageSamples[i];
-    } else if ( i == (NSAMPLES - NSAMPLES_SHIFT)) {
-      currentSamplesFiltered[i] = currentSamples[i];
-    } else {
-      voltageSamplesFiltered[i] = voltageSamples[i];
-      currentSamplesFiltered[i] = currentSamples[i - NSAMPLES_SHIFT];
-    }
-  }
+  //for (int i = 0; i < NSAMPLES; i++) { // posição 0 até 320 
+  //  if (i == 0) {
+  //    voltageSamplesFiltered[i] = voltageSamples[i];
+  //  } else if ( i == (NSAMPLES - NSAMPLES_SHIFT)) {
+  //    currentSamplesFiltered[i] = currentSamples[i];
+  //  } else {
+  //    voltageSamplesFiltered[i] = voltageSamples[i];
+  //    currentSamplesFiltered[i] = currentSamples[i - NSAMPLES_SHIFT];
+  //  }
+  //}
 
   struct ElectricalMeasurements eletricMeasurements;
   int32_t sumVoltageSamples = 0;
   int32_t sumCurrentSamples = 0;
 
   for (int i = 0; i < nsamples; i++) {
-    sumVoltageSamples += voltageSamplesFiltered[i];
-    sumCurrentSamples += currentSamplesFiltered[i];
+    sumVoltageSamples += voltageSamples[i];
+    sumCurrentSamples += currentSamples[i];
   }
 
   int voltageMean = (int)(sumVoltageSamples / (int32_t)(nsamples));
@@ -200,8 +200,8 @@ struct ElectricalMeasurements measureRms(int* voltageSamples, int* currentSample
   int32_t sumCurrent = 0;
   int32_t sumInstantaneousPower = 0;
   for (int i = 0; i < nsamples; i++) {
-    int32_t y_voltage = (voltageSamplesFiltered[i] - voltageMean);
-    int32_t y_current = (currentSamplesFiltered[i] - currentMean);
+    int32_t y_voltage = (voltageSamples [i] - voltageMean);
+    int32_t y_current = (currentSamples[i] - currentMean);
     int32_t y_instantaneousPower = y_voltage * y_current;
   
     sumVoltage += y_voltage * y_voltage;
