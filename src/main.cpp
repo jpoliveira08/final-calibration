@@ -51,7 +51,7 @@ void setup() {
 
 void loop() {
   measurements = makeMeasurement();
-  if (countRmsMeasurements <= 100) {
+  if (countRmsMeasurements < 100) {
     sumVoltageToSend += measurements.vrms;
     sumCurrentToSend += measurements.irms;
     sumRealPowerToSend += measurements.realPower;
@@ -114,22 +114,10 @@ void readAnalogSamples() {
 }
 
 struct ElectricalMeasurements measureRms(int* voltageSamples, int* currentSamples, int nsamples) {
-  float numberOfTurnsCT = 2.0;
   struct ElectricalMeasurements eletricMeasurements;
-  // int32_t sumVoltageSamples = 0;
-  // int32_t sumCurrentSamples = 0;
 
-  // for (int i = 0; i < nsamples; i++) {
-  //   Serial.print(voltageSamples[i]);
-  //   Serial.print(" ");
-  //   Serial.println(currentSamples[i]);
-  //   sumVoltageSamples += voltageSamples[i];
-  //   sumCurrentSamples += currentSamples[i];
-  // }
   int offsetVoltage = 1851;
   int offsetCurrent = 1848;
-  // int voltageMean = (int)(sumVoltageSamples / (int32_t)(nsamples));
-  // int currentMean = (int)(sumCurrentSamples / (int32_t)(nsamples));
 
   float sumVoltage = 0;
   float sumCurrent = 0;
@@ -140,7 +128,6 @@ struct ElectricalMeasurements measureRms(int* voltageSamples, int* currentSample
 
     float y_voltage = ((float)y_voltageNoOffset) * 3.3 / 4096.0;
     float y_current = ((float)y_currentNoOffset) * 3.3 / 4096.0;
-    //y_current = y_current / numberOfTurnsCT;
 
     float y_instantaneousPower = y_voltage * y_current;
   
